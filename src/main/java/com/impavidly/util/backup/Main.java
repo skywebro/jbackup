@@ -14,36 +14,35 @@ import org.apache.commons.cli.ParseException;
 import org.yaml.snakeyaml.Yaml;
 
 public final class Main {
-    private static String optionName = "yaml";
+    private static final String OPTION_NAME = "yaml";
     private static Options options = new Options();
 
     static {
-        Main.options.addOption(Main.optionName, true, "The YAML configuration file path.");
+        Main.options.addOption(Main.OPTION_NAME, true, MessagesBundle.getString("program_usage_message"));
     }
 
     private static CommandLine getCommandLine(String[] args) throws ParseException {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(Main.options, args);
 
-        if (!cmd.hasOption(Main.optionName)) throw new ParseException("No YAML file specified");
+        if (!cmd.hasOption(Main.OPTION_NAME)) throw new ParseException("No YAML file specified");
 
         return cmd;
     }
 
     public static void main(String[] args) {
         String yamlFile = "";
-
         try {
             CommandLine cmd = Main.getCommandLine(args);
-            yamlFile = cmd.getOptionValue(Main.optionName);
+            yamlFile = cmd.getOptionValue(Main.OPTION_NAME);
             Yaml yaml = new Yaml();
             Object data = yaml.load(new FileInputStream(new File(yamlFile)));
-            System.out.print(yaml.dump(data));
+            System.out.println(yaml.dump(data));
         } catch (ParseException e) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp(new Object(){}.getClass().getEnclosingClass().getName(), Main.options);
         } catch (FileNotFoundException e) {
-            System.err.println("ERROR: The file " + yamlFile + " was not found.");
+            System.err.println(String.format(MessagesBundle.getString("file_not_found"), yamlFile));
         }
     }
 }
