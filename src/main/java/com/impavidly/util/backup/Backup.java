@@ -33,7 +33,7 @@ public final class Backup {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp(new Object(){}.getClass().getEnclosingClass().getName(), Backup.options);
         } catch (FileNotFoundException e) {
-            System.err.println(String.format(MessagesBundle.getString("file_not_found"), configFilePathName));
+            System.err.println("[ERROR] " + e.getLocalizedMessage());
         }
     }
 
