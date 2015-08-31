@@ -13,25 +13,23 @@ import org.apache.commons.cli.ParseException;
 
 import org.yaml.snakeyaml.Yaml;
 
-public final class Backup {
+public final class Main {
     private static final String OPTION_NAME = "yaml";
     private static Options options = new Options();
 
     static {
-        Backup.options.addOption(Backup.OPTION_NAME, true, MessagesBundle.getString("program_usage_message"));
+        Main.options.addOption(Main.OPTION_NAME, true, MessagesBundle.getString("yaml_usage_message"));
     }
 
     public static void main(String[] args) {
-        String configFilePathName = "";
-
         try {
-            configFilePathName = Backup.getConfigurationFilePathName(args);
+            String configFilePathName = Main.getConfigurationFilePathName(args);
             Yaml yaml = new Yaml();
             Object data = yaml.load(new FileInputStream(new File(configFilePathName)));
             System.out.println(yaml.dump(data));
         } catch (ParseException e) {
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp(new Object(){}.getClass().getEnclosingClass().getName(), Backup.options);
+            formatter.printHelp(new Object(){}.getClass().getEnclosingClass().getName(), Main.options);
         } catch (FileNotFoundException e) {
             System.err.println("[ERROR] " + e.getLocalizedMessage());
         }
@@ -39,10 +37,10 @@ public final class Backup {
 
     private static String getConfigurationFilePathName(String[] args) throws ParseException {
         CommandLineParser parser = new DefaultParser();
-        CommandLine cmd = parser.parse(Backup.options, args);
+        CommandLine cmd = parser.parse(Main.options, args);
 
-        if (!cmd.hasOption(Backup.OPTION_NAME)) throw new ParseException("No configuration file present");
+        if (!cmd.hasOption(Main.OPTION_NAME)) throw new ParseException("No configuration file present");
 
-        return cmd.getOptionValue(Backup.OPTION_NAME);
+        return cmd.getOptionValue(Main.OPTION_NAME);
     }
 }
