@@ -1,0 +1,16 @@
+general:
+  retries: 5
+
+observers:
+  mysql:
+    className: com.impavidly.util.backup.observers.mysql
+    command: /usr/bin/mysqldump
+    outputPath:
+    csvFieldsIndexes:
+  ftp:
+    className: com.impavidly.util.backup.observers.ftp
+    command: /usr/bin/wget
+    outputPath:
+    csvFieldsIndexes:
+csv:
+  csv1: sample.csv

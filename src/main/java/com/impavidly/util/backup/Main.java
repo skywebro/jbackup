@@ -1,7 +1,5 @@
 package com.impavidly.util.backup;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import org.apache.commons.cli.CommandLine;
@@ -11,9 +9,10 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.ConstructorException;
+import org.yaml.snakeyaml.parser.ParserException;
 
-public final class Main {
+public class Main {
     private static final String OPTION_NAME = "yaml";
     private static Options options = new Options();
 
@@ -23,15 +22,13 @@ public final class Main {
 
     public static void main(String[] args) {
         try {
-            String configFilePathName = Main.getConfigurationFilePathName(args);
-            Yaml yaml = new Yaml();
-            Object data = yaml.load(new FileInputStream(new File(configFilePathName)));
-            System.out.println(yaml.dump(data));
+            Backup backup = new Backup(Main.getConfigurationFilePathName(args));
+            backup.run();
         } catch (ParseException e) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp(new Object(){}.getClass().getEnclosingClass().getName(), Main.options);
-        } catch (FileNotFoundException e) {
-            System.err.println("[ERROR] " + e.getLocalizedMessage());
+        } catch (FileNotFoundException | ParserException | ConstructorException e) {
+            System.err.println(e.getLocalizedMessage());
         }
     }
 
