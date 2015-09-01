@@ -17,7 +17,7 @@ public class Main {
     private static Options options = new Options();
 
     static {
-        Main.options.addOption(Main.OPTION_NAME, true, MessagesBundle.getString("yaml_usage_message"));
+        Main.options.addOption(Main.OPTION_NAME, true, "The YAML configuration file");
     }
 
     public static void main(String[] args) {
@@ -28,7 +28,7 @@ public class Main {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp(new Object(){}.getClass().getEnclosingClass().getName(), Main.options);
         } catch (FileNotFoundException | ParserException | ConstructorException e) {
-            System.err.println(e.getLocalizedMessage());
+            System.err.println(e.getMessage());
         }
     }
 
