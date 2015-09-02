@@ -13,4 +13,4 @@ observers:
     outputPath:
     csvFieldNames:
 csvs:
-  csv1: sample.csv
+  csv1: sample_ftp_mysql.csv
