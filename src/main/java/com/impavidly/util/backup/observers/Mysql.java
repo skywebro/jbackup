@@ -12,6 +12,10 @@ public class Mysql extends Base {
         try {
             List<Integer> indexes = this.getCsvFieldIndexes((Backup) o);
             System.out.println(this.getObserverName().toUpperCase() + ": " + record.get(0));
-        } catch (IllegalArgumentException e) {}
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println("Invalid CSV index: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+        }
     }
 }

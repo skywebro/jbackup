@@ -7,8 +7,6 @@ import com.impavidly.util.backup.Backup;
 import org.apache.commons.csv.CSVRecord;
 
 public class Ftp extends Base {
-    final private String observerName = "ftp";
-
     @Override
     public void update(Observable o, Object arg) {
         CSVRecord record = (CSVRecord)arg;
