@@ -1,10 +1,16 @@
 package com.impavidly.util.backup.config;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Observer {
     private String className;
     private String command;
     private String outputPath;
-    private String csvFieldNames;
+    private String csvFieldsIndexes;
+    private List<Integer> csvFieldsIndexesList;
 
     public String getClassName() {
         return className;
@@ -30,11 +36,23 @@ public class Observer {
         this.outputPath = outputPath;
     }
 
-    public String getCsvFieldNames() {
-        return csvFieldNames;
+    public String getCsvFieldsIndexes() {
+        return csvFieldsIndexes;
     }
 
-    public void setCsvFieldNames(String csvFieldNames) {
-        this.csvFieldNames = csvFieldNames;
+    public void setCsvFieldsIndexes(String csvFieldsIndexes) {
+        this.csvFieldsIndexes = csvFieldsIndexes;
+        this.csvFieldsIndexesList = Collections.emptyList();
+        try {
+            //explode the indexes csv
+            List<String> stringList = Arrays.asList(csvFieldsIndexes.trim().split("\\s*,\\s*"));
+            this.csvFieldsIndexesList = stringList.stream().map(Integer::valueOf).collect(Collectors.toList());
+        } catch (NullPointerException e) {
+            //it's already set to empty list
+        }
+    }
+
+    public List<Integer> getCsvFieldsIndexesList() {
+        return csvFieldsIndexesList;
     }
 }

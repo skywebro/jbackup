@@ -40,13 +40,14 @@ public class Backup extends Observable {
         for(Map.Entry<String, String> entry : csvFileNames.entrySet()) {
             try {
                 final Reader reader = new InputStreamReader(new BOMInputStream(new FileInputStream(entry.getValue())), "UTF-8");
+                final CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
                 try {
-                    final CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
                     for (CSVRecord record : parser) {
                         this.setChanged();
                         this.notifyObservers(record);
                     }
                 } finally {
+                    parser.close();
                     reader.close();
                 }
             } catch (IOException e) {

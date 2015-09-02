@@ -6,11 +6,11 @@ observers:
     className: com.impavidly.util.backup.observers.Mysql
     command: /usr/bin/mysqldump
     outputPath:
-    csvFieldNames:
+    csvFieldsIndexes: 0, 1, 2
   ftp:
     className: com.impavidly.util.backup.observers.Ftp
     command: /usr/bin/wget
     outputPath:
-    csvFieldNames:
+    csvFieldsIndexes: 3, 4, 5
 csvs:
   csv1: sample_ftp_mysql.csv
