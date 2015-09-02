@@ -27,7 +27,7 @@ public class Main {
         } catch (ParseException e) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp(new Object(){}.getClass().getEnclosingClass().getName(), Main.options);
-        } catch (FileNotFoundException | ParserException | ConstructorException e) {
+        } catch (FileNotFoundException | ParserException | ConstructorException | UnsupportedOperationException e) {
             System.err.println(e.getMessage());
         }
     }

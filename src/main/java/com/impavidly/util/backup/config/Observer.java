@@ -4,7 +4,7 @@ public class Observer {
     private String className;
     private String command;
     private String outputPath;
-    private String csvFieldsIndexes;
+    private String csvFieldNames;
 
     public String getClassName() {
         return className;
@@ -30,11 +30,11 @@ public class Observer {
         this.outputPath = outputPath;
     }
 
-    public String getCsvFieldsIndexes() {
-        return csvFieldsIndexes;
+    public String getCsvFieldNames() {
+        return csvFieldNames;
     }
 
-    public void setCsvFieldsIndexes(String csvFieldsIndexes) {
-        this.csvFieldsIndexes = csvFieldsIndexes;
+    public void setCsvFieldNames(String csvFieldNames) {
+        this.csvFieldNames = csvFieldNames;
     }
 }

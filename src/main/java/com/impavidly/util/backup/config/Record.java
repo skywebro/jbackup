@@ -3,15 +3,15 @@ package com.impavidly.util.backup.config;
 import java.util.Map;
 
 public class Record {
-    private Map<String, String> general;
+    private General general;
     private Map<String, Observer> observers;
-    private Map<String, String> csv;
+    private Map<String, String> csvs;
 
-    public Map<String, String> getGeneral() {
+    public General getGeneral() {
         return general;
     }
 
-    public void setGeneral(Map<String, String> general) {
+    public void setGeneral(General general) {
         this.general = general;
     }
 
@@ -23,11 +23,11 @@ public class Record {
         this.observers = observers;
     }
 
-    public Map<String, String> getCsv() {
-        return csv;
+    public Map<String, String> getCsvs() {
+        return csvs;
     }
 
-    public void setCsv(Map<String, String> csv) {
-        this.csv = csv;
+    public void setCsvs(Map<String, String> csvs) {
+        this.csvs = csvs;
     }
 }
