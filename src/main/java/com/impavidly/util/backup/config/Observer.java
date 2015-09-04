@@ -1,9 +1,6 @@
 package com.impavidly.util.backup.config;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Observer {
     private String className;
