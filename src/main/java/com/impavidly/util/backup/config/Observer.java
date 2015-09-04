@@ -1,9 +1,9 @@
 package com.impavidly.util.backup.config;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Observer {
     private String className;
@@ -42,13 +42,23 @@ public class Observer {
 
     public void setCsvFieldsIndexes(String csvFieldsIndexes) {
         this.csvFieldsIndexes = csvFieldsIndexes;
-        this.csvFieldsIndexesList = Collections.emptyList();
+        List<Integer> integerList = new ArrayList<>();
         try {
             //explode the indexes csv
             List<String> stringList = Arrays.asList(csvFieldsIndexes.trim().split("\\s*,\\s*"));
-            this.csvFieldsIndexesList = stringList.stream().map(Integer::valueOf).collect(Collectors.toList());
+            for(String s : stringList) {
+                try {
+                    integerList.add(Integer.valueOf(s));
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid CSV index: " + s);
+                }
+            }
+            //this.csvFieldsIndexesList = stringList.stream().map(Integer::parseInt).collect(Collectors.toList());
         } catch (NullPointerException e) {
             //it's already set to empty list
+            System.out.println(e.getMessage());
+        } finally {
+            this.csvFieldsIndexesList = integerList;
         }
     }
 

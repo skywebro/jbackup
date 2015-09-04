@@ -33,6 +33,14 @@ public class Backup extends Observable {
         this.config = config;
     }
 
+    class Task {
+        public void run(CSVRecord record) {
+            Backup backup = Backup.this;
+            backup.setChanged();
+            backup.notifyObservers(record);
+        }
+    }
+
     public void run() throws UnsupportedOperationException {
         this.addObservers();
 
@@ -43,8 +51,8 @@ public class Backup extends Observable {
                 final CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
                 try {
                     for (CSVRecord record : parser) {
-                        this.setChanged();
-                        this.notifyObservers(record);
+                        Task task = new Task();
+                        task.run(record);
                     }
                 } finally {
                     parser.close();
@@ -64,7 +72,7 @@ public class Backup extends Observable {
             try {
                 java.util.Observer observer = (java.util.Observer)Class.forName(observerClassName).newInstance();
                 this.addObserver(observer);
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NullPointerException e) {
                 System.err.println("Could not instantiate " + observerClassName);
             }
         }
