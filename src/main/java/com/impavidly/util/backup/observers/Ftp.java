@@ -10,5 +10,6 @@ import com.impavidly.util.backup.annotations.Observer;
 public class Ftp extends Base {
     @Override
     public void update(Observable o, Object arg) {
+        System.out.println(this.getStrategy().toUpperCase());
     }
 }

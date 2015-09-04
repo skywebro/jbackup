@@ -2,7 +2,7 @@ general:
   retries: 3
 
 observers:
-  mysql:
+  mysqldump:
     className: com.impavidly.util.backup.observers.Mysql
     command: /usr/bin/mysqldump
     outputPath:
