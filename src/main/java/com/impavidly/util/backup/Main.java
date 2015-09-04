@@ -1,16 +1,8 @@
 package com.impavidly.util.backup;
 
 import java.io.FileNotFoundException;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-
-import org.yaml.snakeyaml.constructor.ConstructorException;
-import org.yaml.snakeyaml.parser.ParserException;
+import org.apache.commons.cli.*;
+import org.yaml.snakeyaml.error.MarkedYAMLException;
 
 public class Main {
     private static final String OPTION_NAME = "yaml";
@@ -27,7 +19,7 @@ public class Main {
         } catch (ParseException e) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp(new Object(){}.getClass().getEnclosingClass().getName(), Main.options);
-        } catch (FileNotFoundException | ParserException | ConstructorException | UnsupportedOperationException e) {
+        } catch (FileNotFoundException | MarkedYAMLException | UnsupportedOperationException e) {
             System.err.println(e.getMessage());
         }
     }
