@@ -71,9 +71,9 @@ public class Backup extends Observable {
         for(Map.Entry<String, Observer> entry : observers.entrySet()) {
             String observerClassName = entry.getValue().getClassName();
             try {
-                Class clazz = Class.forName(observerClassName);
-                Constructor constructor = clazz.getConstructor(Observer.class);
-                java.util.Observer observer = (java.util.Observer)constructor.newInstance(entry.getValue());
+                Class<?> clazz = Class.forName(observerClassName);
+                Constructor ctor = clazz.getConstructor(Observer.class);
+                java.util.Observer observer = (java.util.Observer)ctor.newInstance(entry.getValue());
                 this.addObserver(observer);
             } catch (ReflectiveOperationException | NullPointerException e) {
                 System.err.println("Could not instantiate " + observerClassName);
