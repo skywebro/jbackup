@@ -1,12 +1,15 @@
 package com.impavidly.util.backup.observers;
 
 import java.util.Observable;
-import com.impavidly.util.backup.annotations.Observer;
+import com.impavidly.util.backup.config.Observer;
 
-@Observer(strategy = "mysqldump")
 public class Mysql extends Base {
+    public Mysql(Observer config) {
+        super(config);
+    }
+
     @Override
     public void update(Observable o, Object arg) {
-        System.out.println(this.getStrategy().toUpperCase());
+        System.out.println(this.getClassName().toUpperCase());
     }
 }

@@ -1,6 +1,7 @@
 package com.impavidly.util.backup;
 
 import java.io.*;
+import java.lang.reflect.*;
 import java.util.Map;
 import java.util.Observable;
 
@@ -70,9 +71,11 @@ public class Backup extends Observable {
         for(Map.Entry<String, Observer> entry : observers.entrySet()) {
             String observerClassName = entry.getValue().getClassName();
             try {
-                java.util.Observer observer = (java.util.Observer)Class.forName(observerClassName).newInstance();
+                Class clazz = Class.forName(observerClassName);
+                Constructor constructor = clazz.getConstructor(Observer.class);
+                java.util.Observer observer = (java.util.Observer)constructor.newInstance(entry.getValue());
                 this.addObserver(observer);
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NullPointerException e) {
+            } catch (ReflectiveOperationException | NullPointerException e) {
                 System.err.println("Could not instantiate " + observerClassName);
             }
         }

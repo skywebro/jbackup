@@ -1,15 +1,15 @@
 package com.impavidly.util.backup.observers;
 
-import java.util.List;
 import java.util.Observable;
-import org.apache.commons.csv.CSVRecord;
-import com.impavidly.util.backup.Backup;
-import com.impavidly.util.backup.annotations.Observer;
+import com.impavidly.util.backup.config.Observer;
 
-@Observer(strategy = "ftp")
 public class Ftp extends Base {
+    public Ftp(Observer config) {
+        super(config);
+    }
+
     @Override
     public void update(Observable o, Object arg) {
-        System.out.println(this.getStrategy().toUpperCase());
+        System.out.println(this.getClassName().toUpperCase());
     }
 }
