@@ -3,6 +3,8 @@ package com.impavidly.util.backup;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.csv.*;
 import org.apache.commons.io.input.BOMInputStream;
@@ -55,21 +57,22 @@ public class Backup extends Observable {
     }
 
     public void run() throws UnsupportedOperationException {
-        this.addObservers();
+        addObservers();
 
-        Map<String, String> csvFileNames = this.getConfig().getRecord().getCsvs();
+        Map<String, String> csvFileNames = getConfig().getRecord().getCsvs();
         for(Map.Entry<String, String> entry : csvFileNames.entrySet()) {
             try {
-                final Reader reader = new InputStreamReader(new BOMInputStream(new FileInputStream(entry.getValue())), "UTF-8");
-                final CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
-                try {
+                try (
+                    final Reader reader = new InputStreamReader(new BOMInputStream(new FileInputStream(entry.getValue())), "UTF-8");
+                    final CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
+                ) {
+                    int threadCount = getConfig().getRecord().getGeneral().getThreadCount();
+                    ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
                     for (CSVRecord record : parser) {
-                        Thread thread = new BackupThread(record);
-                        thread.start();
+                        Thread backupThread = new BackupThread(record);
+                        executorService.execute(backupThread);
                     }
-                } finally {
-                    parser.close();
-                    reader.close();
+                    executorService.shutdown();
                 }
             } catch (IOException e) {
                 System.err.println(e.getMessage());

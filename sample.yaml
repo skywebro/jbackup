@@ -1,6 +1,6 @@
 general:
   retries: 3
-
+  threadCount: 3
 observers:
   mysqldump:
     className: com.impavidly.util.backup.observers.Mysql
