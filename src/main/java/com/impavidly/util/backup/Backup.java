@@ -70,8 +70,8 @@ public class Backup extends Observable {
                     int threadCount = getConfig().getRecord().getGeneral().getThreadCount();
                     ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
                     for (CSVRecord record : parser) {
-                        Thread thread = new BackupThread(record);
-                        executorService.execute(thread);
+                        Thread backupThread = new BackupThread(record);
+                        executorService.execute(backupThread);
                     }
                     executorService.shutdown();
                 }
