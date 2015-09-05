@@ -2,15 +2,15 @@ general:
   retries: 3
   threadCount: 3
 observers:
-  mysqldump:
+  mysql:
     className: com.impavidly.util.backup.observers.Mysql
     command: /usr/bin/mysqldump
-    outputPath:
+    outputPath: D:/Work/tmp/jbackup/mysql
     csvFieldsIndexes: 0, 1, 2
   ftp:
     className: com.impavidly.util.backup.observers.Ftp
     command: /usr/bin/wget
-    outputPath:
+    outputPath: D:/Work/tmp/jbackup/ftp
     csvFieldsIndexes: 3, 4, 5
 csvs:
   csv1: sample_ftp_mysql.csv

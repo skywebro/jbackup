@@ -3,8 +3,7 @@ package com.impavidly.util.backup;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 import org.apache.commons.csv.*;
 import org.apache.commons.io.input.BOMInputStream;
@@ -51,8 +50,10 @@ public class Backup extends Observable {
         @Override
         public void run() {
             Backup backup = Backup.this;
-            backup.setChanged();
-            backup.notifyObservers(getRecord());
+            synchronized (backup) {
+                backup.setChanged();
+                backup.notifyObservers(getRecord());
+            }
         }
     }
 
@@ -69,8 +70,8 @@ public class Backup extends Observable {
                     int threadCount = getConfig().getRecord().getGeneral().getThreadCount();
                     ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
                     for (CSVRecord record : parser) {
-                        Thread backupThread = new BackupThread(record);
-                        executorService.execute(backupThread);
+                        Thread thread = new BackupThread(record);
+                        executorService.execute(thread);
                     }
                     executorService.shutdown();
                 }

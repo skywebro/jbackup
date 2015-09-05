@@ -1,13 +1,16 @@
 package com.impavidly.util.backup.observers;
 
+import java.io.File;
 import java.util.Observable;
 import com.impavidly.util.backup.config.Observer;
 
 public abstract class Base implements java.util.Observer {
     protected Observer config = null;
 
-    public Base(Observer config) {
+    public Base(Observer config) throws SecurityException {
         setConfig(config);
+        File outputPath = new File(config.getOutputPath());
+        outputPath.mkdirs();
     }
 
     @Override
