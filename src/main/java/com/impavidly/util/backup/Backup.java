@@ -31,11 +31,26 @@ public class Backup extends Observable {
         this.config = config;
     }
 
-    class Task {
-        public void run(CSVRecord record) {
+    class BackupThread extends Thread {
+        protected CSVRecord record;
+
+        public BackupThread(CSVRecord record) {
+            setRecord(record);
+        }
+
+        public void setRecord(CSVRecord record) {
+            this.record = record;
+        }
+
+        public CSVRecord getRecord() {
+            return record;
+        }
+
+        @Override
+        public void run() {
             Backup backup = Backup.this;
             backup.setChanged();
-            backup.notifyObservers(record);
+            backup.notifyObservers(getRecord());
         }
     }
 
@@ -49,8 +64,8 @@ public class Backup extends Observable {
                 final CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
                 try {
                     for (CSVRecord record : parser) {
-                        Task task = new Task();
-                        task.run(record);
+                        Thread thread = new BackupThread(record);
+                        thread.start();
                     }
                 } finally {
                     parser.close();
