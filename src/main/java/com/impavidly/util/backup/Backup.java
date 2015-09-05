@@ -63,7 +63,7 @@ public class Backup extends Observable {
         for(Map.Entry<String, String> entry : csvFileNames.entrySet()) {
             try {
                 try (
-                    final Reader reader = new InputStreamReader(new BOMInputStream(new FileInputStream(entry.getValue())), "UTF-8");
+                    final Reader reader = new InputStreamReader(new BOMInputStream(new FileInputStream(new File(entry.getValue()))), "UTF-8");
                     final CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
                 ) {
                     int threadCount = getConfig().getRecord().getGeneral().getThreadCount();
