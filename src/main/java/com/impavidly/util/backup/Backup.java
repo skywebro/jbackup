@@ -16,12 +16,12 @@ import com.impavidly.util.backup.config.Runnable;
 import com.impavidly.util.backup.tasks.Task;
 
 public class Backup {
-    protected Config config = null;
-    protected List<Task> tasks = new ArrayList<>();
-    protected Map<Runnable, Constructor> runnables = new HashMap<>();
+    protected Config config;
+    protected Map<Runnable, Constructor> runnables;
 
     public Backup(String configFilePathName) throws FileNotFoundException, ParserException, ConstructorException {
         setConfig(configFilePathName);
+        cacheTaskConstructors();
     }
 
     public Config getConfig() {
@@ -36,17 +36,7 @@ public class Backup {
         this.config = config;
     }
 
-    public void setTasks(List<Task> tasks) {
-        this.tasks = tasks;
-    }
-
-    public List<Task> getTasks() {
-        return tasks;
-    }
-
     public void run() throws UnsupportedOperationException {
-        cacheTaskConstructors();
-
         int threadCount = getConfig().getRecord().getGeneral().getThreads();
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
         Map<String, String> csvFileNames = getConfig().getRecord().getCsvs();
@@ -78,17 +68,25 @@ public class Backup {
         executorService.shutdown();
     }
 
+    public void setRunnables(Map<Runnable, Constructor> runnables) {
+        this.runnables = runnables;
+    }
+
+    public Map<Runnable, Constructor> getRunnables() {
+        return runnables;
+    }
+
     protected void cacheTaskConstructors() throws UnsupportedOperationException {
         Map<String, Runnable> runnable = getConfig().getRecord().getRunnables();
-        runnables = new HashMap<>();
-        Date now = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        String dateString = dateFormat.format(new Date());
+        setRunnables(new HashMap<>());
 
         for(Map.Entry<String, Runnable> runnableEntry : runnable.entrySet()) {
             String taskClassName = runnableEntry.getValue().getClassName();
             try {
                 String outputPath = runnableEntry.getValue().getOutputPath();
-                outputPath = outputPath.replaceAll("\\{\\$date\\}", dateFormat.format(now));
+                outputPath = outputPath.replaceAll("\\{\\$date\\}", dateString);
                 runnableEntry.getValue().setOutputPath(outputPath);
 
                 File outputDir = new File(outputPath);
@@ -96,7 +94,7 @@ public class Backup {
 
                 Class<?> clazz = Class.forName(taskClassName);
                 Constructor ctor = clazz.getConstructor();
-                runnables.put(runnableEntry.getValue(), ctor);
+                getRunnables().put(runnableEntry.getValue(), ctor);
             } catch (ReflectiveOperationException e) {
                 System.err.println("Could not create " + taskClassName);
             }
