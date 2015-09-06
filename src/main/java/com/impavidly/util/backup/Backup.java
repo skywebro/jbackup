@@ -90,12 +90,12 @@ public class Backup {
                 outputPath = outputPath.replaceAll("\\{\\$date\\}", dateString);
                 runnableEntry.getValue().setOutputPath(outputPath);
 
-                File outputDir = new File(outputPath);
-                outputDir.mkdirs();
-
                 Class<?> clazz = Class.forName(taskClassName);
                 Constructor ctor = clazz.getConstructor();
                 getRunnables().put(runnableEntry.getValue(), ctor);
+
+                File outputDir = new File(outputPath);
+                outputDir.mkdirs();
             } catch (ReflectiveOperationException e) {
                 System.err.println("Could not create " + taskClassName);
             }
