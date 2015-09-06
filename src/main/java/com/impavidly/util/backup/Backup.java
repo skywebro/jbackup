@@ -82,7 +82,7 @@ public class Backup {
     protected void cacheTaskConstructors() throws UnsupportedOperationException {
         Map<String, Runnable> configRunnables = getConfig().getRecord().getRunnables();
         Date now = new Date();
-        String regex = "\\{\\$date\\(([yMdHms]*)\\)\\}";
+        String regex = "\\{\\$date\\(([GyMdHhmSsEDFwWakKz \\-_]*)\\)\\}";
         Pattern p = Pattern.compile(regex);
         setRunnables(new HashMap<>());
 
