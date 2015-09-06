@@ -62,9 +62,4 @@ public class Runnable {
     public List<Integer> getCsvFieldsIndexesList() {
         return csvFieldsIndexesList;
     }
-
-    @Override
-    public int hashCode() {
-        return className.hashCode();
-    }
 }

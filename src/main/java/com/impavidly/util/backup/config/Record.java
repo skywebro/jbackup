@@ -19,8 +19,8 @@ public class Record {
         return runnables;
     }
 
-    public void setRunnables(Map<String, Runnable> tasks) {
-        this.runnables = tasks;
+    public void setRunnables(Map<String, Runnable> runnables) {
+        this.runnables = runnables;
     }
 
     public Map<String, String> getCsvs() {
