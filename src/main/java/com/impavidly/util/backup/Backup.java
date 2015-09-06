@@ -5,6 +5,8 @@ import java.lang.reflect.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.csv.*;
 import org.apache.commons.io.input.BOMInputStream;
@@ -79,14 +81,25 @@ public class Backup {
 
     protected void cacheTaskConstructors() throws UnsupportedOperationException {
         Map<String, Runnable> configRunnables = getConfig().getRecord().getRunnables();
-        String dateString = (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date());
+        Date now = new Date();
+        String regex = "\\{\\$date\\(([yMdHms]*)\\)\\}";
+        Pattern p = Pattern.compile(regex);
         setRunnables(new HashMap<>());
 
         for(Map.Entry<String, Runnable> runnableEntry : configRunnables.entrySet()) {
             String taskClassName = runnableEntry.getValue().getClassName();
             try {
                 String outputPath = runnableEntry.getValue().getOutputPath();
-                outputPath = outputPath.replaceAll("\\{\\$date\\}", dateString);
+
+                Matcher matcher = p.matcher(outputPath);
+                String dateFormat = ((matcher.find()) && (0 < matcher.group(1).length())) ? matcher.group(1) : "yyyyMMddHHmmss";
+                String dateString = (new SimpleDateFormat(dateFormat)).format(now);
+                outputPath = outputPath.replaceAll(regex, dateString);
+
+                if (outputPath.toLowerCase().contains("$date")) {
+                    throw new UnsupportedOperationException("Unrecognizable date format in " + outputPath);
+                }
+
                 runnableEntry.getValue().setOutputPath(outputPath);
 
                 Class<?> clazz = Class.forName(taskClassName);
