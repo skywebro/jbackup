@@ -46,7 +46,7 @@ public class Backup {
     public void run() throws UnsupportedOperationException {
         cacheTaskConstructors();
 
-        int threadCount = getConfig().getRecord().getGeneral().getThreadCount();
+        int threadCount = getConfig().getRecord().getGeneral().getThreads();
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
         Map<String, String> csvFileNames = getConfig().getRecord().getCsvs();
 
@@ -64,7 +64,7 @@ public class Backup {
                                 task.setContext(record);
                                 executorService.execute(task);
                             } catch (ReflectiveOperationException | NullPointerException e) {
-                                System.err.println("Could not instantiate " + ctor);
+                                System.err.println("Error executing " + ctor);
                             }
                         }
                     }

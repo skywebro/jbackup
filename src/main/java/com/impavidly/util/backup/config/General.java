@@ -2,14 +2,14 @@ package com.impavidly.util.backup.config;
 
 public class General {
     private Integer retries;
-    private Integer threadCount;
+    private Integer threads;
 
-    public Integer getThreadCount() {
-        return threadCount;
+    public Integer getThreads() {
+        return threads;
     }
 
-    public void setThreadCount(Integer threadCount) {
-        this.threadCount = threadCount;
+    public void setThreads(Integer threadCount) {
+        this.threads = threadCount;
     }
 
     public Integer getRetries() {
