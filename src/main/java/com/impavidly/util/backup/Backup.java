@@ -82,11 +82,11 @@ public class Backup {
         Map<String, Runnable> runnable = getConfig().getRecord().getRunnables();
         runnables = new HashMap<>();
         Date now = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
 
         for(Map.Entry<String, Runnable> runnableEntry : runnable.entrySet()) {
             String taskClassName = runnableEntry.getValue().getClassName();
             try {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
                 String outputPath = runnableEntry.getValue().getOutputPath();
                 outputPath = outputPath.replaceAll("\\{\\$date\\}", dateFormat.format(now));
                 runnableEntry.getValue().setOutputPath(outputPath);
