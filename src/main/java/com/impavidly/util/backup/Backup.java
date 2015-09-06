@@ -21,19 +21,20 @@ public class Backup {
 
     public Backup(String configFilePathName) throws FileNotFoundException, ParserException, ConstructorException {
         setConfig(configFilePathName);
-        cacheTaskConstructors();
     }
 
     public Config getConfig() {
         return config;
     }
 
-    public void setConfig(String configFilePathName) throws FileNotFoundException, ParserException, ConstructorException {
+    public void setConfig(String configFilePathName) throws FileNotFoundException, ParserException, ConstructorException, UnsupportedOperationException {
         this.config = new Config(configFilePathName);
+        cacheTaskConstructors();
     }
 
-    public void setConfig(Config config) {
+    public void setConfig(Config config) throws UnsupportedOperationException {
         this.config = config;
+        cacheTaskConstructors();
     }
 
     public void run() throws UnsupportedOperationException {
