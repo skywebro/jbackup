@@ -95,9 +95,8 @@ public class Backup {
                 while (matcher.find()) {
                     String match = matcher.group(1);
                     String dateFormat = (0 < match.length()) ? match : "yyyyMMddHHmmss";
-                    String replace = "\\{\\$date\\(" + match + "\\)\\}";
                     String dateString = (new SimpleDateFormat(dateFormat)).format(now);
-                    outputPath = outputPath.replaceAll(replace, dateString);
+                    outputPath = outputPath.replace(matcher.group(0), dateString);
                 }
 
                 if (outputPath.toLowerCase().contains("$date")) {
