@@ -92,9 +92,13 @@ public class Backup {
                 String outputPath = runnableEntry.getValue().getOutputPath();
 
                 Matcher matcher = p.matcher(outputPath);
-                String dateFormat = ((matcher.find()) && (0 < matcher.group(1).length())) ? matcher.group(1) : "yyyyMMddHHmmss";
-                String dateString = (new SimpleDateFormat(dateFormat)).format(now);
-                outputPath = outputPath.replaceAll(regex, dateString);
+                while (matcher.find()) {
+                    String match = matcher.group(1);
+                    String dateFormat = (0 < match.length()) ? match : "yyyyMMddHHmmss";
+                    String replace = "\\{\\$date\\(" + match + "\\)\\}";
+                    String dateString = (new SimpleDateFormat(dateFormat)).format(now);
+                    outputPath = outputPath.replaceAll(replace, dateString);
+                }
 
                 if (outputPath.toLowerCase().contains("$date")) {
                     throw new UnsupportedOperationException("Unrecognizable date format in " + outputPath);
