@@ -11,10 +11,12 @@ import org.yaml.snakeyaml.constructor.ConstructorException;
 import org.yaml.snakeyaml.parser.ParserException;
 
 import com.impavidly.util.backup.config.Config;
-import com.impavidly.util.backup.config.Observer;
+import com.impavidly.util.backup.config.Thread;
+import com.impavidly.util.backup.tasks.Task;
 
-public class Backup extends Observable {
+public class Backup {
     protected Config config = null;
+    protected List<Task> tasks = new ArrayList<>();
 
     public Backup(String configFilePathName) throws FileNotFoundException, ParserException, ConstructorException {
         setConfig(configFilePathName);
@@ -32,46 +34,37 @@ public class Backup extends Observable {
         this.config = config;
     }
 
-    class BackupThread extends Thread {
-        protected CSVRecord record;
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
+    }
 
-        public BackupThread(CSVRecord record) {
-            setRecord(record);
-        }
-
-        public void setRecord(CSVRecord record) {
-            this.record = record;
-        }
-
-        public CSVRecord getRecord() {
-            return record;
-        }
-
-        @Override
-        public void run() {
-            Backup backup = Backup.this;
-            synchronized (backup) {
-                backup.setChanged();
-                backup.notifyObservers(getRecord());
-            }
-        }
+    public List<Task> getTasks() {
+        return tasks;
     }
 
     public void run() throws UnsupportedOperationException {
-        addObservers();
-
         Map<String, String> csvFileNames = getConfig().getRecord().getCsvs();
-        for(Map.Entry<String, String> entry : csvFileNames.entrySet()) {
+        for(Map.Entry<String, String> csv : csvFileNames.entrySet()) {
             try {
                 try (
-                    final Reader reader = new InputStreamReader(new BOMInputStream(new FileInputStream(new File(entry.getValue()))), "UTF-8");
+                    final Reader reader = new InputStreamReader(new BOMInputStream(new FileInputStream(new File(csv.getValue()))), "UTF-8");
                     final CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
                 ) {
+                    Map<String, Thread> threads = this.getConfig().getRecord().getThreads();
                     int threadCount = getConfig().getRecord().getGeneral().getThreadCount();
                     ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
-                    for (CSVRecord record : parser) {
-                        Thread backupThread = new BackupThread(record);
-                        executorService.execute(backupThread);
+                    for(CSVRecord record : parser) {
+                        for(Map.Entry<String, Thread> thread : threads.entrySet()) {
+                            String taskClassName = thread.getValue().getClassName();
+                            try {
+                                Class<?> clazz = Class.forName(taskClassName);
+                                Constructor ctor = clazz.getConstructor(Thread.class, Object.class);
+                                Task task = (Task)ctor.newInstance(thread.getValue(), record);
+                                executorService.execute(task);
+                            } catch (ReflectiveOperationException | NullPointerException e) {
+                                System.err.println("Could not instantiate " + taskClassName);
+                            }
+                        }
                     }
                     executorService.shutdown();
                 }
@@ -79,23 +72,5 @@ public class Backup extends Observable {
                 System.err.println(e.getMessage());
             }
         }
-    }
-
-    protected void addObservers() throws UnsupportedOperationException {
-        Map<String, Observer> observers = this.getConfig().getRecord().getObservers();
-
-        for(Map.Entry<String, Observer> entry : observers.entrySet()) {
-            String observerClassName = entry.getValue().getClassName();
-            try {
-                Class<?> clazz = Class.forName(observerClassName);
-                Constructor ctor = clazz.getConstructor(Observer.class);
-                java.util.Observer observer = (java.util.Observer)ctor.newInstance(entry.getValue());
-                this.addObserver(observer);
-            } catch (ReflectiveOperationException | NullPointerException e) {
-                System.err.println("Could not instantiate " + observerClassName);
-            }
-        }
-
-        if (0 == this.countObservers()) throw new UnsupportedOperationException("No observers found.");
     }
 }

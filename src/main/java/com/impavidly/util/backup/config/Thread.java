@@ -2,7 +2,7 @@ package com.impavidly.util.backup.config;
 
 import java.util.*;
 
-public class Observer {
+public class Thread {
     private String className;
     private String command;
     private String outputPath;
