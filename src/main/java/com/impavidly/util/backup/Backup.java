@@ -44,16 +44,18 @@ public class Backup {
     }
 
     public void run() throws UnsupportedOperationException {
-        setConstructors();
+        cacheTaskConstructors();
+
+        int threadCount = getConfig().getRecord().getGeneral().getThreadCount();
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
         Map<String, String> csvFileNames = getConfig().getRecord().getCsvs();
+
         for(Map.Entry<String, String> csv : csvFileNames.entrySet()) {
             try {
                 try (
                     final Reader reader = new InputStreamReader(new BOMInputStream(new FileInputStream(new File(csv.getValue()))), "UTF-8");
                     final CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
                 ) {
-                    int threadCount = getConfig().getRecord().getGeneral().getThreadCount();
-                    ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
                     for(CSVRecord record : parser) {
                         for(Map.Entry<Runnable, Constructor> ctor : runnables.entrySet()) {
                             try {
@@ -66,16 +68,18 @@ public class Backup {
                             }
                         }
                     }
-                    executorService.shutdown();
                 }
             } catch (IOException e) {
                 System.err.println(e.getMessage());
             }
         }
+
+        executorService.shutdown();
     }
 
-    protected void setConstructors() throws UnsupportedOperationException {
-        Map<String, Runnable> runnable = this.getConfig().getRecord().getRunnables();
+    protected void cacheTaskConstructors() throws UnsupportedOperationException {
+        Map<String, Runnable> runnable = getConfig().getRecord().getRunnables();
+        runnables = new HashMap<>();
 
         for(Map.Entry<String, Runnable> runnableEntry : runnable.entrySet()) {
             String taskClassName = runnableEntry.getValue().getClassName();
@@ -83,6 +87,9 @@ public class Backup {
                 Class<?> clazz = Class.forName(taskClassName);
                 Constructor ctor = clazz.getConstructor();
                 runnables.put(runnableEntry.getValue(), ctor);
+
+                File outputPath = new File(runnableEntry.getValue().getOutputPath());
+                outputPath.mkdirs();
             } catch (ReflectiveOperationException e) {
                 System.err.println("Could not create " + taskClassName);
             }
