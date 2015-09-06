@@ -49,7 +49,7 @@ public class Backup {
                     final CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
                 ) {
                     for(CSVRecord record : parser) {
-                        for(Map.Entry<Runnable, Constructor> ctor : runnables.entrySet()) {
+                        for(Map.Entry<Runnable, Constructor> ctor : getRunnables().entrySet()) {
                             try {
                                 Task task = (Task)ctor.getValue().newInstance();
                                 task.setConfig(ctor.getKey());
@@ -101,6 +101,6 @@ public class Backup {
             }
         }
 
-        if (0 == runnables.size()) throw new UnsupportedOperationException("No runnable found");
+        if (0 == getRunnables().size()) throw new UnsupportedOperationException("No runnable found");
     }
 }
