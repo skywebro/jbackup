@@ -2,6 +2,7 @@ package com.impavidly.util.backup;
 
 import java.io.*;
 import java.lang.reflect.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -80,16 +81,22 @@ public class Backup {
     protected void cacheTaskConstructors() throws UnsupportedOperationException {
         Map<String, Runnable> runnable = getConfig().getRecord().getRunnables();
         runnables = new HashMap<>();
+        Date now = new Date();
 
         for(Map.Entry<String, Runnable> runnableEntry : runnable.entrySet()) {
             String taskClassName = runnableEntry.getValue().getClassName();
             try {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
+                String outputPath = runnableEntry.getValue().getOutputPath();
+                outputPath = outputPath.replaceAll("\\{\\$date\\}", dateFormat.format(now));
+                runnableEntry.getValue().setOutputPath(outputPath);
+
+                File outputDir = new File(outputPath);
+                outputDir.mkdirs();
+
                 Class<?> clazz = Class.forName(taskClassName);
                 Constructor ctor = clazz.getConstructor();
                 runnables.put(runnableEntry.getValue(), ctor);
-
-                File outputPath = new File(runnableEntry.getValue().getOutputPath());
-                outputPath.mkdirs();
             } catch (ReflectiveOperationException e) {
                 System.err.println("Could not create " + taskClassName);
             }

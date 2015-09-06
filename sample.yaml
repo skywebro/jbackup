@@ -6,13 +6,13 @@ runnables:
     className: com.impavidly.util.backup.tasks.Mysql
     # https://dev.mysql.com/downloads/mysql/
     command: D:/Work/mysql-5.6.26-winx64/bin/mysqldump
-    outputPath: D:/Work/tmp/jbackup/mysql
+    outputPath: D:/Work/tmp/jbackup/{$date}/mysql
     csvFieldsIndexes: 0, 1, 2
   ftp:
     className: com.impavidly.util.backup.tasks.Ftp
     # http://gnuwin32.sourceforge.net/packages/wget.htm
     command: D:/Work/GnuWin/bin/wget
-    outputPath: D:/Work/tmp/jbackup/ftp
+    outputPath: D:/Work/tmp/jbackup/{$date}/ftp
     csvFieldsIndexes: 3, 4, 5
 csvs:
   csv1: sample_ftp_mysql.csv
