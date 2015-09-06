@@ -11,12 +11,13 @@ import org.yaml.snakeyaml.constructor.ConstructorException;
 import org.yaml.snakeyaml.parser.ParserException;
 
 import com.impavidly.util.backup.config.Config;
-import com.impavidly.util.backup.config.Thread;
+import com.impavidly.util.backup.config.Runnable;
 import com.impavidly.util.backup.tasks.Task;
 
 public class Backup {
     protected Config config = null;
     protected List<Task> tasks = new ArrayList<>();
+    protected Map<Runnable, Constructor> runnables = new HashMap<>();
 
     public Backup(String configFilePathName) throws FileNotFoundException, ParserException, ConstructorException {
         setConfig(configFilePathName);
@@ -43,6 +44,7 @@ public class Backup {
     }
 
     public void run() throws UnsupportedOperationException {
+        setConstructors();
         Map<String, String> csvFileNames = getConfig().getRecord().getCsvs();
         for(Map.Entry<String, String> csv : csvFileNames.entrySet()) {
             try {
@@ -50,19 +52,17 @@ public class Backup {
                     final Reader reader = new InputStreamReader(new BOMInputStream(new FileInputStream(new File(csv.getValue()))), "UTF-8");
                     final CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
                 ) {
-                    Map<String, Thread> threads = this.getConfig().getRecord().getThreads();
                     int threadCount = getConfig().getRecord().getGeneral().getThreadCount();
                     ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
                     for(CSVRecord record : parser) {
-                        for(Map.Entry<String, Thread> thread : threads.entrySet()) {
-                            String taskClassName = thread.getValue().getClassName();
+                        for(Map.Entry<Runnable, Constructor> ctor : runnables.entrySet()) {
                             try {
-                                Class<?> clazz = Class.forName(taskClassName);
-                                Constructor ctor = clazz.getConstructor(Thread.class, Object.class);
-                                Task task = (Task)ctor.newInstance(thread.getValue(), record);
+                                Task task = (Task)ctor.getValue().newInstance();
+                                task.setConfig(ctor.getKey());
+                                task.setContext(record);
                                 executorService.execute(task);
                             } catch (ReflectiveOperationException | NullPointerException e) {
-                                System.err.println("Could not instantiate " + taskClassName);
+                                System.err.println("Could not instantiate " + ctor);
                             }
                         }
                     }
@@ -72,5 +72,22 @@ public class Backup {
                 System.err.println(e.getMessage());
             }
         }
+    }
+
+    protected void setConstructors() throws UnsupportedOperationException {
+        Map<String, Runnable> runnable = this.getConfig().getRecord().getRunnables();
+
+        for(Map.Entry<String, Runnable> runnableEntry : runnable.entrySet()) {
+            String taskClassName = runnableEntry.getValue().getClassName();
+            try {
+                Class<?> clazz = Class.forName(taskClassName);
+                Constructor ctor = clazz.getConstructor();
+                runnables.put(runnableEntry.getValue(), ctor);
+            } catch (ReflectiveOperationException e) {
+                System.err.println("Could not create " + taskClassName);
+            }
+        }
+
+        if (0 == runnables.size()) throw new UnsupportedOperationException("No runnable found");
     }
 }

@@ -2,7 +2,7 @@ package com.impavidly.util.backup.config;
 
 import java.util.*;
 
-public class Thread {
+public class Runnable {
     private String className;
     private String command;
     private String outputPath;
@@ -61,5 +61,10 @@ public class Thread {
 
     public List<Integer> getCsvFieldsIndexesList() {
         return csvFieldsIndexesList;
+    }
+
+    @Override
+    public int hashCode() {
+        return className.hashCode();
     }
 }
