@@ -78,12 +78,11 @@ public class Backup {
     }
 
     protected void cacheTaskConstructors() throws UnsupportedOperationException {
-        Map<String, Runnable> runnable = getConfig().getRecord().getRunnables();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        String dateString = dateFormat.format(new Date());
+        Map<String, Runnable> configRunnables = getConfig().getRecord().getRunnables();
+        String dateString = (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date());
         setRunnables(new HashMap<>());
 
-        for(Map.Entry<String, Runnable> runnableEntry : runnable.entrySet()) {
+        for(Map.Entry<String, Runnable> runnableEntry : configRunnables.entrySet()) {
             String taskClassName = runnableEntry.getValue().getClassName();
             try {
                 String outputPath = runnableEntry.getValue().getOutputPath();
