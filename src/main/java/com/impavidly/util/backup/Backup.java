@@ -37,15 +37,15 @@ public class Backup {
 
     public void setConfig(String configFilePathName) throws IOException, MarkedYAMLException, UnsupportedOperationException {
         this.config = new Config(configFilePathName);
-        bootstrap.run();
     }
 
     public void setConfig(Config config) throws IOException, UnsupportedOperationException {
         this.config = config;
-        bootstrap.run();
     }
 
-    public void run() throws UnsupportedOperationException {
+    public void run() throws UnsupportedOperationException, IOException {
+        bootstrap.run();
+
         int threadCount = getConfig().getRecord().getGeneral().getThreads();
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
         Map<String, String> csvFileNames = getConfig().getRecord().getCsvs();
