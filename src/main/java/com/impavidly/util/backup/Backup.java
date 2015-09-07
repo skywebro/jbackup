@@ -98,18 +98,18 @@ public class Backup {
             for(Map.Entry<String, Runnable> runnableConfigEntry : runnablesConfig.entrySet()) {
                 String taskClassName = runnableConfigEntry.getValue().getClassName();
                 try {
-                    String outputPath = parseOutputPath(runnableConfigEntry.getValue().getOutputPath(), now);
-                    runnableConfigEntry.getValue().setOutputPath(outputPath);
+                    String parsedOutputPath = parseOutputPath(runnableConfigEntry.getValue().getOutputPath(), now);
+                    runnableConfigEntry.getValue().setParsedOutputPath(parsedOutputPath);
 
                     Class<?> clazz = Class.forName(taskClassName);
                     Constructor ctor = clazz.getConstructor();
                     getRunnables().put(runnableConfigEntry.getValue(), ctor);
 
                     try {
-                        Path resultPath = FileSystems.getDefault().getPath(outputPath).normalize();
+                        Path resultPath = FileSystems.getDefault().getPath(parsedOutputPath).normalize();
                         Files.createDirectories(resultPath);
                         if (!Files.isDirectory(resultPath) || !Files.isWritable(resultPath)) {
-                            throw new IOException(outputPath + " is not a directory or it's not writable");
+                            throw new IOException(parsedOutputPath + " is not a directory or it's not writable");
                         }
                     } catch (FileAlreadyExistsException | InvalidPathException e) {
                         throw new IOException(e);

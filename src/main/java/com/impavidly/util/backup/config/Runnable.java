@@ -6,6 +6,7 @@ public class Runnable {
     private String className;
     private String command;
     private String outputPath;
+    private String parsedOutputPath;
     private String csvFieldsIndexes;
     private List<Integer> csvFieldsIndexesList;
 
@@ -31,6 +32,14 @@ public class Runnable {
 
     public void setOutputPath(String outputPath) {
         this.outputPath = outputPath;
+    }
+
+    public String getParsedOutputPath() {
+        return parsedOutputPath;
+    }
+
+    public void setParsedOutputPath(String parsedOutputPath) {
+        this.parsedOutputPath = parsedOutputPath;
     }
 
     public String getCsvFieldsIndexes() {
