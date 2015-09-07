@@ -2,6 +2,7 @@ package com.impavidly.util.backup;
 
 import java.io.*;
 import java.lang.reflect.*;
+import java.nio.file.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
@@ -108,10 +109,11 @@ public class Backup {
                 Constructor ctor = clazz.getConstructor();
                 getRunnables().put(runnableConfigEntry.getValue(), ctor);
 
-                File outputDir = new File(outputPath);
-                outputDir.mkdirs();
-                if (!outputDir.exists() || !outputDir.canWrite()) {
-                    throw new IOException(outputPath + " does not exist or it's not writable");
+                try {
+                    Path resultPath = FileSystems.getDefault().getPath(outputPath).normalize();
+                    Files.createDirectories(resultPath);
+                } catch (InvalidPathException e) {
+                    throw new IOException(e);
                 }
             } catch (ReflectiveOperationException e) {
                 System.err.println("Could not create " + taskClassName);
