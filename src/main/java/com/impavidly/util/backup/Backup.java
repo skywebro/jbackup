@@ -20,8 +20,14 @@ import com.impavidly.util.backup.tasks.Task;
 public class Backup {
     protected Config config;
     protected Map<Runnable, Constructor> runnables;
+    protected Bootstrap bootstrap;
+
+    public Backup() {
+        bootstrap = new Bootstrap();
+    }
 
     public Backup(String configFilePathName) throws IOException, MarkedYAMLException {
+        this();
         setConfig(configFilePathName);
     }
 
@@ -31,12 +37,12 @@ public class Backup {
 
     public void setConfig(String configFilePathName) throws IOException, MarkedYAMLException, UnsupportedOperationException {
         this.config = new Config(configFilePathName);
-        Bootstrap.run(this);
+        bootstrap.run();
     }
 
     public void setConfig(Config config) throws IOException, UnsupportedOperationException {
         this.config = config;
-        Bootstrap.run(this);
+        bootstrap.run();
     }
 
     public void run() throws UnsupportedOperationException {
@@ -79,15 +85,15 @@ public class Backup {
         return runnables;
     }
 
-    static class Bootstrap {
-        static void run(Backup backup) throws IOException, UnsupportedOperationException {
-            prepareTasksConstructors(backup);
+    class Bootstrap {
+        void run() throws IOException, UnsupportedOperationException {
+            prepareTasksConstructors();
         }
 
-        static void prepareTasksConstructors(Backup backup) throws IOException, UnsupportedOperationException {
-            Map<String, Runnable> runnablesConfig = backup.getConfig().getRecord().getRunnables();
+        void prepareTasksConstructors() throws IOException, UnsupportedOperationException {
+            Map<String, Runnable> runnablesConfig = getConfig().getRecord().getRunnables();
             Date now = new Date();
-            backup.setRunnables(new HashMap<>());
+            setRunnables(new HashMap<>());
 
             for(Map.Entry<String, Runnable> runnableConfigEntry : runnablesConfig.entrySet()) {
                 String taskClassName = runnableConfigEntry.getValue().getClassName();
@@ -97,7 +103,7 @@ public class Backup {
 
                     Class<?> clazz = Class.forName(taskClassName);
                     Constructor ctor = clazz.getConstructor();
-                    backup.getRunnables().put(runnableConfigEntry.getValue(), ctor);
+                    getRunnables().put(runnableConfigEntry.getValue(), ctor);
 
                     try {
                         Path resultPath = FileSystems.getDefault().getPath(outputPath).normalize();
@@ -113,10 +119,10 @@ public class Backup {
                 }
             }
 
-            if (0 == backup.getRunnables().size()) throw new UnsupportedOperationException("No runnable found");
+            if (0 == getRunnables().size()) throw new UnsupportedOperationException("No runnable found");
         }
 
-        static String parseOutputPath(String outputPath, Date date) throws UnsupportedOperationException {
+        String parseOutputPath(String outputPath, Date date) throws UnsupportedOperationException {
             String regex = "\\{\\$date\\(([GyMdHhmSsEDFwWakKz \\-_]*)\\)\\}";
             Pattern p = Pattern.compile(regex);
             Matcher matcher = p.matcher(outputPath);
