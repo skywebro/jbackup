@@ -1,6 +1,6 @@
 package com.impavidly.util.backup;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import org.apache.commons.cli.*;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 
@@ -19,7 +19,7 @@ public class Main {
         } catch (ParseException e) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp(new Object(){}.getClass().getEnclosingClass().getName(), Main.options);
-        } catch (FileNotFoundException | MarkedYAMLException | UnsupportedOperationException e) {
+        } catch (IOException | MarkedYAMLException | UnsupportedOperationException e) {
             System.err.println(e.getMessage());
         }
     }

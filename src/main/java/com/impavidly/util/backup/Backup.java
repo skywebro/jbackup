@@ -10,8 +10,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.csv.*;
 import org.apache.commons.io.input.BOMInputStream;
-import org.yaml.snakeyaml.constructor.ConstructorException;
-import org.yaml.snakeyaml.parser.ParserException;
+import org.yaml.snakeyaml.error.MarkedYAMLException;
 
 import com.impavidly.util.backup.config.Config;
 import com.impavidly.util.backup.config.Runnable;
@@ -21,7 +20,7 @@ public class Backup {
     protected Config config;
     protected Map<Runnable, Constructor> runnables;
 
-    public Backup(String configFilePathName) throws FileNotFoundException, ParserException, ConstructorException {
+    public Backup(String configFilePathName) throws IOException, MarkedYAMLException {
         setConfig(configFilePathName);
     }
 
@@ -29,12 +28,12 @@ public class Backup {
         return config;
     }
 
-    public void setConfig(String configFilePathName) throws FileNotFoundException, ParserException, ConstructorException, UnsupportedOperationException {
+    public void setConfig(String configFilePathName) throws IOException, MarkedYAMLException, UnsupportedOperationException {
         this.config = new Config(configFilePathName);
         cacheTaskConstructors();
     }
 
-    public void setConfig(Config config) throws UnsupportedOperationException {
+    public void setConfig(Config config) throws IOException, UnsupportedOperationException {
         this.config = config;
         cacheTaskConstructors();
     }
@@ -79,7 +78,7 @@ public class Backup {
         return runnables;
     }
 
-    protected void cacheTaskConstructors() throws UnsupportedOperationException {
+    protected void cacheTaskConstructors() throws IOException, UnsupportedOperationException {
         Map<String, Runnable> runnablesConfig = getConfig().getRecord().getRunnables();
         Date now = new Date();
         String regex = "\\{\\$date\\(([GyMdHhmSsEDFwWakKz \\-_]*)\\)\\}";
@@ -112,7 +111,7 @@ public class Backup {
                 File outputDir = new File(outputPath);
                 outputDir.mkdirs();
                 if (!outputDir.exists() || !outputDir.canWrite()) {
-                    throw new UnsupportedOperationException(outputPath + " does not exist or it's not writable");
+                    throw new IOException(outputPath + " does not exist or it's not writable");
                 }
             } catch (ReflectiveOperationException e) {
                 System.err.println("Could not create " + taskClassName);
