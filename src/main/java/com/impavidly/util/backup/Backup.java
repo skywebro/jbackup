@@ -19,15 +19,10 @@ import com.impavidly.util.backup.tasks.Task;
 
 public class Backup {
     protected Config config;
-    protected Map<Runnable, Constructor> runnables;
-    protected Bootstrap bootstrap;
-
-    public Backup() {
-        bootstrap = new Bootstrap();
-    }
+    protected Map<Runnable, Constructor> runnable;
+    protected Bootstrap bootstrap = new Bootstrap();
 
     public Backup(String configFilePathName) throws IOException, MarkedYAMLException {
-        this();
         setConfig(configFilePathName);
     }
 
@@ -57,7 +52,7 @@ public class Backup {
                     final CSVParser parser = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
                 ) {
                     for(CSVRecord record : parser) {
-                        for(Map.Entry<Runnable, Constructor> ctor : getRunnables().entrySet()) {
+                        for(Map.Entry<Runnable, Constructor> ctor : getRunnable().entrySet()) {
                             try {
                                 Task task = (Task)ctor.getValue().newInstance();
                                 task.setConfig(ctor.getKey());
@@ -77,12 +72,12 @@ public class Backup {
         executorService.shutdown();
     }
 
-    public void setRunnables(Map<Runnable, Constructor> runnables) {
-        this.runnables = runnables;
+    public void setRunnable(Map<Runnable, Constructor> runnable) {
+        this.runnable = runnable;
     }
 
-    public Map<Runnable, Constructor> getRunnables() {
-        return runnables;
+    public Map<Runnable, Constructor> getRunnable() {
+        return runnable;
     }
 
     class Bootstrap {
@@ -91,11 +86,11 @@ public class Backup {
         }
 
         void prepareTasksConstructors() throws IOException, UnsupportedOperationException {
-            Map<String, Runnable> runnablesConfig = getConfig().getRecord().getRunnables();
+            Map<String, Runnable> runnableConfig = getConfig().getRecord().getRunnable();
             Date now = new Date();
-            setRunnables(new HashMap<>());
+            setRunnable(new HashMap<>());
 
-            for(Map.Entry<String, Runnable> runnableConfigEntry : runnablesConfig.entrySet()) {
+            for(Map.Entry<String, Runnable> runnableConfigEntry : runnableConfig.entrySet()) {
                 String taskClassName = runnableConfigEntry.getValue().getClassName();
                 try {
                     String parsedOutputPath = parseOutputPath(runnableConfigEntry.getValue().getOutputPath(), now);
@@ -103,7 +98,7 @@ public class Backup {
 
                     Class<?> clazz = Class.forName(taskClassName);
                     Constructor ctor = clazz.getConstructor();
-                    getRunnables().put(runnableConfigEntry.getValue(), ctor);
+                    getRunnable().put(runnableConfigEntry.getValue(), ctor);
 
                     try {
                         Path resultPath = FileSystems.getDefault().getPath(parsedOutputPath).normalize();
@@ -119,7 +114,7 @@ public class Backup {
                 }
             }
 
-            if (0 == getRunnables().size()) throw new UnsupportedOperationException("No runnable found");
+            if (0 == getRunnable().size()) throw new UnsupportedOperationException("No runnable found");
         }
 
         String parseOutputPath(String outputPath, Date date) throws UnsupportedOperationException {

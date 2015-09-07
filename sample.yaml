@@ -1,7 +1,7 @@
 general:
   retries: 3
   threads: 4
-runnables:
+runnable:
   mysql:
     className: com.impavidly.util.backup.tasks.Mysql
     # https://dev.mysql.com/downloads/mysql/

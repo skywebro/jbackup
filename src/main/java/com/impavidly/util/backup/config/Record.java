@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class Record {
     private General general;
-    private Map<String, Runnable> runnables;
+    private Map<String, Runnable> runnable;
     private Map<String, String> csvs;
 
     public General getGeneral() {
@@ -15,12 +15,12 @@ public class Record {
         this.general = general;
     }
 
-    public Map<String, Runnable> getRunnables() {
-        return runnables;
+    public Map<String, Runnable> getRunnable() {
+        return runnable;
     }
 
-    public void setRunnables(Map<String, Runnable> runnables) {
-        this.runnables = runnables;
+    public void setRunnable(Map<String, Runnable> runnable) {
+        this.runnable = runnable;
     }
 
     public Map<String, String> getCsvs() {
