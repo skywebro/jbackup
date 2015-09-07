@@ -112,7 +112,10 @@ public class Backup {
                 try {
                     Path resultPath = FileSystems.getDefault().getPath(outputPath).normalize();
                     Files.createDirectories(resultPath);
-                } catch (InvalidPathException e) {
+                    if (!Files.isDirectory(resultPath) || !Files.isWritable(resultPath)) {
+                        throw new IOException(outputPath + " is not a directory or it's not writable");
+                    }
+                } catch (FileAlreadyExistsException | InvalidPathException e) {
                     throw new IOException(e);
                 }
             } catch (ReflectiveOperationException e) {
