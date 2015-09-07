@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class Record {
     private General general;
-    private Map<String, Runnable> tasks;
+    private Map<String, Task> tasks;
     private Map<String, String> csvs;
 
     public General getGeneral() {
@@ -15,11 +15,11 @@ public class Record {
         this.general = general;
     }
 
-    public Map<String, Runnable> getTasks() {
+    public Map<String, Task> getTasks() {
         return tasks;
     }
 
-    public void setTasks(Map<String, Runnable> tasks) {
+    public void setTasks(Map<String, Task> tasks) {
         this.tasks = tasks;
     }
 

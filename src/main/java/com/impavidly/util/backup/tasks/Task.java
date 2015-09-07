@@ -1,9 +1,7 @@
 package com.impavidly.util.backup.tasks;
 
-import com.impavidly.util.backup.config.Runnable;
-
 public abstract class Task extends Thread {
-    protected Runnable config = null;
+    protected com.impavidly.util.backup.config.Task config = null;
     protected Object context = null;
 
     @Override
@@ -11,11 +9,11 @@ public abstract class Task extends Thread {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
-    public void setConfig(Runnable config) {
+    public void setConfig(com.impavidly.util.backup.config.Task config) {
         this.config = config;
     }
 
-    public Runnable getConfig() {
+    public com.impavidly.util.backup.config.Task getConfig() {
         return config;
     }
 

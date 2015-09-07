@@ -2,7 +2,7 @@ package com.impavidly.util.backup.config;
 
 import java.util.*;
 
-public class Runnable {
+public class Task {
     private String className;
     private String command;
     private String outputPath;
