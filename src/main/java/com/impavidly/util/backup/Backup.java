@@ -80,16 +80,16 @@ public class Backup {
     }
 
     protected void cacheTaskConstructors() throws UnsupportedOperationException {
-        Map<String, Runnable> configRunnables = getConfig().getRecord().getRunnables();
+        Map<String, Runnable> runnablesConfig = getConfig().getRecord().getRunnables();
         Date now = new Date();
         String regex = "\\{\\$date\\(([GyMdHhmSsEDFwWakKz \\-_]*)\\)\\}";
         Pattern p = Pattern.compile(regex);
         setRunnables(new HashMap<>());
 
-        for(Map.Entry<String, Runnable> runnableEntry : configRunnables.entrySet()) {
-            String taskClassName = runnableEntry.getValue().getClassName();
+        for(Map.Entry<String, Runnable> runnableConfigEntry : runnablesConfig.entrySet()) {
+            String taskClassName = runnableConfigEntry.getValue().getClassName();
             try {
-                String outputPath = runnableEntry.getValue().getOutputPath();
+                String outputPath = runnableConfigEntry.getValue().getOutputPath();
 
                 Matcher matcher = p.matcher(outputPath);
                 while (matcher.find()) {
@@ -103,14 +103,17 @@ public class Backup {
                     throw new UnsupportedOperationException("Unrecognizable date format in " + outputPath);
                 }
 
-                runnableEntry.getValue().setOutputPath(outputPath);
+                runnableConfigEntry.getValue().setOutputPath(outputPath);
 
                 Class<?> clazz = Class.forName(taskClassName);
                 Constructor ctor = clazz.getConstructor();
-                getRunnables().put(runnableEntry.getValue(), ctor);
+                getRunnables().put(runnableConfigEntry.getValue(), ctor);
 
                 File outputDir = new File(outputPath);
                 outputDir.mkdirs();
+                if (!outputDir.exists() || !outputDir.canWrite()) {
+                    throw new UnsupportedOperationException(outputPath + " does not exist or it's not writable");
+                }
             } catch (ReflectiveOperationException e) {
                 System.err.println("Could not create " + taskClassName);
             }
