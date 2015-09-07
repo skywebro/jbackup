@@ -31,12 +31,12 @@ public class Backup {
 
     public void setConfig(String configFilePathName) throws IOException, MarkedYAMLException, UnsupportedOperationException {
         this.config = new Config(configFilePathName);
-        cacheTaskConstructors();
+        Bootstrap.run(this);
     }
 
     public void setConfig(Config config) throws IOException, UnsupportedOperationException {
         this.config = config;
-        cacheTaskConstructors();
+        Bootstrap.run(this);
     }
 
     public void run() throws UnsupportedOperationException {
@@ -79,50 +79,59 @@ public class Backup {
         return runnables;
     }
 
-    protected void cacheTaskConstructors() throws IOException, UnsupportedOperationException {
-        Map<String, Runnable> runnablesConfig = getConfig().getRecord().getRunnables();
-        Date now = new Date();
-        String regex = "\\{\\$date\\(([GyMdHhmSsEDFwWakKz \\-_]*)\\)\\}";
-        Pattern p = Pattern.compile(regex);
-        setRunnables(new HashMap<>());
-
-        for(Map.Entry<String, Runnable> runnableConfigEntry : runnablesConfig.entrySet()) {
-            String taskClassName = runnableConfigEntry.getValue().getClassName();
-            try {
-                String outputPath = runnableConfigEntry.getValue().getOutputPath();
-
-                Matcher matcher = p.matcher(outputPath);
-                while (matcher.find()) {
-                    String match = matcher.group(1);
-                    String dateFormat = (0 < match.length()) ? match : "yyyyMMddHHmmss";
-                    String dateString = (new SimpleDateFormat(dateFormat)).format(now);
-                    outputPath = outputPath.replace(matcher.group(0), dateString);
-                }
-
-                if (outputPath.toLowerCase().contains("$date")) {
-                    throw new UnsupportedOperationException("Unrecognizable date format in " + outputPath);
-                }
-
-                runnableConfigEntry.getValue().setOutputPath(outputPath);
-
-                Class<?> clazz = Class.forName(taskClassName);
-                Constructor ctor = clazz.getConstructor();
-                getRunnables().put(runnableConfigEntry.getValue(), ctor);
-
-                try {
-                    Path resultPath = FileSystems.getDefault().getPath(outputPath).normalize();
-                    Files.createDirectories(resultPath);
-                    if (!Files.isDirectory(resultPath) || !Files.isWritable(resultPath)) {
-                        throw new IOException(outputPath + " is not a directory or it's not writable");
-                    }
-                } catch (FileAlreadyExistsException | InvalidPathException e) {
-                    throw new IOException(e);
-                }
-            } catch (ReflectiveOperationException e) {
-                System.err.println("Could not create " + taskClassName);
-            }
+    static class Bootstrap {
+        static void run(Backup backup) throws IOException, UnsupportedOperationException {
+            prepareTasksConstructors(backup);
         }
 
-        if (0 == getRunnables().size()) throw new UnsupportedOperationException("No runnable found");
+        static void prepareTasksConstructors(Backup backup) throws IOException, UnsupportedOperationException {
+            Map<String, Runnable> runnablesConfig = backup.getConfig().getRecord().getRunnables();
+            Date now = new Date();
+            backup.setRunnables(new HashMap<>());
+
+            for(Map.Entry<String, Runnable> runnableConfigEntry : runnablesConfig.entrySet()) {
+                String taskClassName = runnableConfigEntry.getValue().getClassName();
+                try {
+                    String outputPath = parseOutputPath(runnableConfigEntry.getValue().getOutputPath(), now);
+                    runnableConfigEntry.getValue().setOutputPath(outputPath);
+
+                    Class<?> clazz = Class.forName(taskClassName);
+                    Constructor ctor = clazz.getConstructor();
+                    backup.getRunnables().put(runnableConfigEntry.getValue(), ctor);
+
+                    try {
+                        Path resultPath = FileSystems.getDefault().getPath(outputPath).normalize();
+                        Files.createDirectories(resultPath);
+                        if (!Files.isDirectory(resultPath) || !Files.isWritable(resultPath)) {
+                            throw new IOException(outputPath + " is not a directory or it's not writable");
+                        }
+                    } catch (FileAlreadyExistsException | InvalidPathException e) {
+                        throw new IOException(e);
+                    }
+                } catch (ReflectiveOperationException e) {
+                    System.err.println("Could not create " + taskClassName);
+                }
+            }
+
+            if (0 == backup.getRunnables().size()) throw new UnsupportedOperationException("No runnable found");
+        }
+
+        static String parseOutputPath(String outputPath, Date date) throws UnsupportedOperationException {
+            String regex = "\\{\\$date\\(([GyMdHhmSsEDFwWakKz \\-_]*)\\)\\}";
+            Pattern p = Pattern.compile(regex);
+            Matcher matcher = p.matcher(outputPath);
+            while (matcher.find()) {
+                String match = matcher.group(1);
+                String dateFormat = (0 < match.length()) ? match : "yyyyMMddHHmmss";
+                String dateString = (new SimpleDateFormat(dateFormat)).format(date);
+                outputPath = outputPath.replace(matcher.group(0), dateString);
+            }
+
+            if (outputPath.toLowerCase().contains("$date")) {
+                throw new UnsupportedOperationException("Unrecognizable date format in " + outputPath);
+            }
+
+            return outputPath;
+        }
     }
 }

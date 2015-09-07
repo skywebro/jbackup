@@ -18,7 +18,7 @@ public class Main {
             backup.run();
         } catch (ParseException e) {
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp(new Object(){}.getClass().getEnclosingClass().getName(), Main.options);
+            formatter.printHelp(new Object(){ }.getClass().getEnclosingClass().getName(), Main.options);
         } catch (IOException | MarkedYAMLException | UnsupportedOperationException e) {
             System.err.println(e.getMessage());
         }
