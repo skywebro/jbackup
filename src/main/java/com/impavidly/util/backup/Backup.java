@@ -15,6 +15,7 @@ import org.yaml.snakeyaml.error.MarkedYAMLException;
 
 import com.impavidly.util.backup.config.Config;
 import com.impavidly.util.backup.config.Task;
+import com.impavidly.util.backup.tasks.Base;
 
 public class Backup {
     protected Config config;
@@ -53,7 +54,7 @@ public class Backup {
                     for(CSVRecord record : parser) {
                         for(Map.Entry<Task, Constructor> ctor : getTasks().entrySet()) {
                             try {
-                                com.impavidly.util.backup.tasks.Task task = (com.impavidly.util.backup.tasks.Task)ctor.getValue().newInstance();
+                                Base task = (Base)ctor.getValue().newInstance();
                                 task.setConfig(ctor.getKey());
                                 task.setContext(record);
                                 executorService.execute(task);
