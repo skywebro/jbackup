@@ -34,7 +34,7 @@ public class Backup {
         this.config = new Config(configFilePathName);
     }
 
-    public void setConfig(Config config) throws IOException, UnsupportedOperationException {
+    public void setConfig(Config config) {
         this.config = config;
     }
 
@@ -86,19 +86,19 @@ public class Backup {
         }
 
         void prepareTasksConstructors() throws IOException, UnsupportedOperationException {
-            Map<String, Runnable> runnableConfig = getConfig().getRecord().getRunnable();
+            Map<String, Runnable> tasksConfig = getConfig().getRecord().getTasks();
             Date now = new Date();
             setRunnable(new HashMap<>());
 
-            for(Map.Entry<String, Runnable> runnableConfigEntry : runnableConfig.entrySet()) {
-                String taskClassName = runnableConfigEntry.getValue().getClassName();
+            for(Map.Entry<String, Runnable> taskConfigEntry : tasksConfig.entrySet()) {
+                String taskClassName = taskConfigEntry.getValue().getClassName();
                 try {
-                    String parsedOutputPath = parseOutputPath(runnableConfigEntry.getValue().getOutputPath(), now);
-                    runnableConfigEntry.getValue().setParsedOutputPath(parsedOutputPath);
+                    String parsedOutputPath = parseOutputPath(taskConfigEntry.getValue().getOutputPath(), now);
+                    taskConfigEntry.getValue().setParsedOutputPath(parsedOutputPath);
 
                     Class<?> clazz = Class.forName(taskClassName);
                     Constructor ctor = clazz.getConstructor();
-                    getRunnable().put(runnableConfigEntry.getValue(), ctor);
+                    getRunnable().put(taskConfigEntry.getValue(), ctor);
 
                     try {
                         Path resultPath = FileSystems.getDefault().getPath(parsedOutputPath).normalize();
