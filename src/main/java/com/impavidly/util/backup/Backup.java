@@ -80,15 +80,15 @@ public class Backup {
         return tasks;
     }
 
-    class Bootstrap {
-        void run() throws IOException, UnsupportedOperationException {
+    protected class Bootstrap {
+        protected void run() throws IOException, UnsupportedOperationException {
             prepareTasksConstructors();
         }
 
-        void prepareTasksConstructors() throws IOException, UnsupportedOperationException {
+        protected void prepareTasksConstructors() throws IOException, UnsupportedOperationException {
             Map<String, Task> tasksConfig = getConfig().getRecord().getTasks();
             Date now = new Date();
-            setTasks(new HashMap<>());
+            setTasks(new Hashtable<>());
 
             for(Map.Entry<String, Task> taskConfigEntry : tasksConfig.entrySet()) {
                 String taskClassName = taskConfigEntry.getValue().getClassName();
@@ -117,7 +117,7 @@ public class Backup {
             if (0 == getTasks().size()) throw new UnsupportedOperationException("No runnable found");
         }
 
-        String parseOutputPath(String outputPath, Date date) throws UnsupportedOperationException {
+        protected String parseOutputPath(String outputPath, Date date) throws UnsupportedOperationException {
             String regex = "\\{\\$date\\(([GyMdHhmSsEDFwWakKz \\-_]*)\\)\\}";
             Pattern p = Pattern.compile(regex);
             Matcher matcher = p.matcher(outputPath);
