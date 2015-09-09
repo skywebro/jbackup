@@ -7,14 +7,14 @@ tasks:
     # https://dev.mysql.com/downloads/mysql/
     command: D:/Work/mysql-5.6.26-winx64/bin/mysqldump
     # suitable for hourly backups
-    outputPath: D:/Work/tmp/jbackup/{$date(yyyy)}/{$date(MM)}/{$date(dd)}/{$date(yyyyMMddHH)}/mysql
+    outputPath: D:/Work/tmp/jbackup/${date(yyyy)}/${date(MM)}/${date(dd)}/${date(yyyyMMddHH)}/mysql
     csvFieldsIndexes: 0, 1, 2
   ftp:
     className: com.impavidly.util.backup.tasks.Ftp
     # http://gnuwin32.sourceforge.net/packages/wget.htm
     command: D:/Work/GnuWin/bin/wget
     # suitable for hourly backups
-    outputPath: D:/Work/tmp/jbackup/{$date(yyyy)}/{$date(MM)}/{$date(dd)}/{$date(yyyyMMddHH)}/ftp
+    outputPath: D:/Work/tmp/jbackup/${date(yyyy)}/${date(MM)}/${date(dd)}/${date(yyyyMMddHH)}/ftp
     csvFieldsIndexes: 3, 4, 5
 csvs:
   csv1: sample_ftp_mysql.csv

@@ -118,7 +118,7 @@ public class Backup {
         }
 
         protected String parseOutputPath(String outputPath, Date date) throws UnsupportedOperationException {
-            String regex = "\\{\\$date\\(([GyMdHhmSsEDFwWakKz \\-_]*)\\)\\}";
+            String regex = "\\$\\{date\\(([GyMdHhmSsEDFwWakKz \\-_]*)\\)\\}";
             Pattern p = Pattern.compile(regex);
             Matcher matcher = p.matcher(outputPath);
             while (matcher.find()) {
@@ -128,7 +128,7 @@ public class Backup {
                 outputPath = outputPath.replace(matcher.group(0), dateString);
             }
 
-            if (outputPath.toLowerCase().contains("$date")) {
+            if (outputPath.toLowerCase().contains("${date")) {
                 throw new UnsupportedOperationException("Unrecognizable date format in " + outputPath);
             }
 
